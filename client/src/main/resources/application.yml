@@ -1,0 +1,37 @@
+server:
+  port: 1113
+
+spring:
+  application:
+    name: client
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://postgresql:5432/kafka_data
+    username: kafka_user
+    password: kafka_password
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    packages-to-scan: ru.practicum.common.model,ru.practicum.client.model
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: ""
+
+jackson:
+  property-naming-strategy: SNAKE_CASE
+
+logging:
+  level:
+    org.springframework.boot: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
