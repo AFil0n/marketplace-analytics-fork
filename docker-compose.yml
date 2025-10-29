@@ -1,0 +1,780 @@
+x-kafka_controller:
+  &kafka_controller-env
+  CLUSTER_ID: 'ciWo7IWazngRchmPES6q5A=='
+  KAFKA_PROCESS_ROLES: controller
+  KAFKA_CONTROLLER_QUORUM_VOTERS: 4000@kafka-controller-0:4090
+  KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:SASL_SSL,INTERNAL:SASL_SSL
+  KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+  KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+  KAFKA_AUTO_CREATE_TOPICS_ENABLE: false
+  KAFKA_AUTO_LEADER_REBALANCE_ENABLE: true
+  KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: false
+  KAFKA_REPLICATION_QUOTA_WINDOW_NUM: 11
+  KAFKA_REPLICATION_QUOTA_WINDOW_SIZE_SECONDS: 1
+  KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/secrets/kafka_server_jaas.conf"
+
+  # SASL Config
+  KAFKA_SASL_MECHANISM_CONTROLLER_PROTOCOL: PLAIN
+  KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+  KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+  KAFKA_LISTENER_NAME_CONTROLLER_PLAIN_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin" user_admin="admin";
+  KAFKA_SECURITY_PROTOCOL: 'SASL_SSL'
+
+  # SSL Config
+  KAFKA_SSL_KEYSTORE_TYPE: PKCS12
+  KAFKA_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.keystore.pkcs12
+  KAFKA_SSL_KEYSTORE_PASSWORD: password
+  KAFKA_SSL_KEY_PASSWORD: password
+  KAFKA_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.truststore.jks
+  KAFKA_SSL_TRUSTSTORE_PASSWORD: password
+  KAFKA_SSL_CLIENT_AUTH: required
+  KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: "HTTPS"
+
+  # ACL Config
+  KAFKA_AUTHORIZER_CLASS_NAME: org.apache.kafka.metadata.authorizer.StandardAuthorizer
+  KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: true
+  KAFKA_SUPER_USERS: User:admin
+
+x-kafka_controller_dr:
+  &kafka_controller_dr-env
+  CLUSTER_ID: 'drWo7IWazngRchmPES6q5B=='
+  KAFKA_PROCESS_ROLES: controller
+  KAFKA_CONTROLLER_QUORUM_VOTERS: 5000@kafka-controller-dr-0:5090
+  KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:SASL_SSL,INTERNAL:SASL_SSL
+  KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+  KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+  KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+  KAFKA_AUTO_LEADER_REBALANCE_ENABLE: true
+  KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: false
+  KAFKA_REPLICATION_QUOTA_WINDOW_NUM: 11
+  KAFKA_REPLICATION_QUOTA_WINDOW_SIZE_SECONDS: 1
+  KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/secrets/kafka_server_jaas.conf"
+
+  # SASL Config
+  KAFKA_SASL_MECHANISM_CONTROLLER_PROTOCOL: PLAIN
+  KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+  KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+  KAFKA_LISTENER_NAME_CONTROLLER_PLAIN_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin" user_admin="admin";
+  KAFKA_SECURITY_PROTOCOL: 'SASL_SSL'
+
+  # SSL Config
+  KAFKA_SSL_KEYSTORE_TYPE: PKCS12
+  KAFKA_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.keystore.pkcs12
+  KAFKA_SSL_KEYSTORE_PASSWORD: password
+  KAFKA_SSL_KEY_PASSWORD: password
+  KAFKA_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.truststore.jks
+  KAFKA_SSL_TRUSTSTORE_PASSWORD: password
+  KAFKA_SSL_CLIENT_AUTH: required
+  KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: "HTTPS"
+
+  # ACL Config
+  KAFKA_AUTHORIZER_CLASS_NAME: org.apache.kafka.metadata.authorizer.StandardAuthorizer
+  KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: true
+  KAFKA_SUPER_USERS: User:admin
+
+x-kafka_broker:
+  &kafka_broker-env
+  KAFKA_HEAP_OPTS: "-Xmx512m -Xms256m"
+  KAFKA_JVM_PERFORMANCE_OPTS: "-XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=64m -XX:+UseG1GC -XX:MaxGCPauseMillis=100"
+  KAFKA_PROCESS_ROLES: broker
+  CLUSTER_ID: 'ciWo7IWazngRchmPES6q5A=='
+  KAFKA_CONTROLLER_QUORUM_VOTERS: 4000@kafka-controller-0:4090
+  KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: BROKER:SASL_SSL,CONTROLLER:SASL_SSL,INTERNAL:SASL_SSL
+  KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+  KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+  KAFKA_AUTO_CREATE_TOPICS_ENABLE: false
+  KAFKA_AUTO_LEADER_REBALANCE_ENABLE: true
+  KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: false
+  KAFKA_REPLICATION_QUOTA_WINDOW_NUM: 11
+  KAFKA_REPLICATION_QUOTA_WINDOW_SIZE_SECONDS: 1
+  KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/secrets/kafka_server_jaas.conf"
+
+  KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+  KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 2
+  KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+  KAFKA_DEFAULT_REPLICATION_FACTOR: 2
+  KAFKA_MIN_INSYNC_REPLICAS: 1
+
+  KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+  KAFKA_GROUP_MIN_SESSION_TIMEOUT_MS: 6000
+  KAFKA_GROUP_MAX_SESSION_TIMEOUT_MS: 180000
+
+  # SASL Config
+  KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+  KAFKA_SASL_MECHANISM_CONTROLLER_PROTOCOL: PLAIN
+  KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+  KAFKA_LISTENER_NAME_BROKER_PLAIN_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin" user_admin="admin" user_producer="password" user_consumer="password";
+  KAFKA_LISTENER_NAME_CONTROLLER_PLAIN_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin" user_admin="admin" user_producer="password" user_consumer="password";
+  KAFKA_SECURITY_PROTOCOL: 'SASL_SSL'
+
+  # SSL Config
+  KAFKA_SSL_KEYSTORE_TYPE: PKCS12
+  KAFKA_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.keystore.pkcs12
+  KAFKA_SSL_KEYSTORE_PASSWORD: password
+  KAFKA_SSL_KEY_PASSWORD: password
+  KAFKA_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.truststore.jks
+  KAFKA_SSL_TRUSTSTORE_PASSWORD: password
+  KAFKA_SSL_CLIENT_AUTH: required
+  KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: ""
+
+  # ACL Config
+  KAFKA_AUTHORIZER_CLASS_NAME: org.apache.kafka.metadata.authorizer.StandardAuthorizer
+  KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: true
+  KAFKA_SUPER_USERS: User:admin
+
+x-kafka_broker_dr:
+  &kafka_broker_dr-env
+  KAFKA_PROCESS_ROLES: broker
+  CLUSTER_ID: 'drWo7IWazngRchmPES6q5B=='
+  KAFKA_CONTROLLER_QUORUM_VOTERS: 5000@kafka-controller-dr-0:5090
+  KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: BROKER:SASL_SSL,CONTROLLER:SASL_SSL,INTERNAL:SASL_SSL
+  KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+  KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+  KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+  KAFKA_AUTO_LEADER_REBALANCE_ENABLE: true
+  KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE: false
+  KAFKA_REPLICATION_QUOTA_WINDOW_NUM: 11
+  KAFKA_REPLICATION_QUOTA_WINDOW_SIZE_SECONDS: 1
+  KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/secrets/kafka_server_jaas.conf"
+
+  KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 2
+  KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 2
+  KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+  KAFKA_DEFAULT_REPLICATION_FACTOR: 2
+  KAFKA_MIN_INSYNC_REPLICAS: 1
+
+  KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+  KAFKA_GROUP_MIN_SESSION_TIMEOUT_MS: 6000
+  KAFKA_GROUP_MAX_SESSION_TIMEOUT_MS: 180000
+
+  # SASL Config
+  KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+  KAFKA_SASL_MECHANISM_CONTROLLER_PROTOCOL: PLAIN
+  KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+  KAFKA_LISTENER_NAME_BROKER_PLAIN_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin" user_admin="admin" user_producer="password" user_consumer="password";
+  KAFKA_LISTENER_NAME_CONTROLLER_PLAIN_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin" user_admin="admin" user_producer="password" user_consumer="password";
+  KAFKA_SECURITY_PROTOCOL: 'SASL_SSL'
+
+  # SSL Config
+  KAFKA_SSL_KEYSTORE_TYPE: PKCS12
+  KAFKA_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.keystore.pkcs12
+  KAFKA_SSL_KEYSTORE_PASSWORD: password
+  KAFKA_SSL_KEY_PASSWORD: password
+  KAFKA_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.truststore.jks
+  KAFKA_SSL_TRUSTSTORE_PASSWORD: password
+  KAFKA_SSL_CLIENT_AUTH: required
+  KAFKA_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: ""
+
+  # ACL Config
+  KAFKA_AUTHORIZER_CLASS_NAME: org.apache.kafka.metadata.authorizer.StandardAuthorizer
+  KAFKA_ALLOW_EVERYONE_IF_NO_ACL_FOUND: true
+  KAFKA_SUPER_USERS: User:admin
+
+x-java-service: &java-service
+  build: .
+  networks:
+    - yandex-practicum-kafka
+  environment:
+    KAFKA_BOOTSTRAP_SERVERS: "kafka-0:1090,kafka-1:2090"
+    KAFKA_HEAP_OPTS: "-Xmx256m -Xms128m"
+  volumes:
+    - ./cert/kafka-0-creds:/etc/kafka/secrets
+
+services:
+  # Primary Cluster
+  kafka-controller-0:
+    image: confluentinc/cp-kafka:7.4.4
+    ports:
+      - 4090:4090
+      - 4091:4091
+    environment:
+      <<: *kafka_controller-env
+      KAFKA_NODE_ID: 4000
+      KAFKA_LISTENERS: CONTROLLER://:4090
+    volumes:
+      - ./cert/controller-creds:/etc/kafka/secrets
+    networks:
+      - yandex-practicum-kafka
+    healthcheck:
+      test: [ "CMD", "bash", "-c", "echo 'Controller health check'" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  kafka-0:
+    image: confluentinc/cp-kafka:7.4.4
+    ports:
+      - 1090:1090
+      - 1091:1091
+    volumes:
+      - ./cert/kafka-0-creds:/etc/kafka/secrets
+    environment:
+      <<: *kafka_broker-env
+      KAFKA_NODE_ID: 1000
+      KAFKA_LISTENERS: BROKER://:1090,INTERNAL://:1092
+      KAFKA_ADVERTISED_LISTENERS: BROKER://kafka-0:1090,INTERNAL://kafka-0:1092
+      KAFKA_HEAP_OPTS: "-Xmx1g -Xms512m"
+      KAFKA_JMX_OPTS: "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=1091"
+      KAFKA_JMX_PORT: 1091
+    networks:
+      - yandex-practicum-kafka
+    depends_on:
+      - kafka-controller-0
+    healthcheck:
+      test: ["CMD-SHELL", "echo 'Kafka is starting' || exit 0"] # Всегда успешный healthcheck
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+
+  kafka-1:
+    image: confluentinc/cp-kafka:7.4.4
+    ports:
+      - 2090:2090
+      - 2091:2091
+    volumes:
+      - ./cert/kafka-0-creds:/etc/kafka/secrets
+    environment:
+      <<: *kafka_broker-env
+      KAFKA_NODE_ID: 2000
+      KAFKA_LISTENERS: BROKER://:2090,INTERNAL://:2092
+      KAFKA_ADVERTISED_LISTENERS: BROKER://kafka-1:2090,INTERNAL://kafka-1:2092
+      KAFKA_HEAP_OPTS: "-Xmx1g -Xms512m"
+      KAFKA_JMX_OPTS: "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=1091"
+      KAFKA_JMX_PORT: 2091
+    networks:
+      - yandex-practicum-kafka
+    depends_on:
+      - kafka-0
+    healthcheck:
+      test: ["CMD-SHELL", "echo 'Kafka is starting' || exit 0"] # Всегда успешный healthcheck
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # DR Cluster (Disaster Recovery)
+  kafka-controller-dr-0:
+    image: confluentinc/cp-kafka:7.4.4
+    ports:
+      - 5090:5090
+      - 5091:5091
+    environment:
+      <<: *kafka_controller_dr-env
+      KAFKA_NODE_ID: 5000
+      KAFKA_LISTENERS: CONTROLLER://:5090
+    volumes:
+      - ./cert/controller-creds:/etc/kafka/secrets
+    networks:
+      - yandex-practicum-kafka
+
+  kafka-dr-0:
+    image: confluentinc/cp-kafka:7.4.4
+    ports:
+      - 3090:3090
+      - 3091:3091
+    volumes:
+      - ./cert/kafka-0-creds:/etc/kafka/secrets
+    environment:
+      <<: *kafka_broker_dr-env
+      KAFKA_NODE_ID: 3000
+      KAFKA_LISTENERS: BROKER://:3090,INTERNAL://:3092
+      KAFKA_ADVERTISED_LISTENERS: BROKER://kafka-dr-0:3090,INTERNAL://kafka-dr-0:3092
+      KAFKA_HEAP_OPTS: "-Xmx1g -Xms512m"
+      KAFKA_JMX_OPTS: "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=1091"
+      KAFKA_JMX_PORT: 3091
+    networks:
+      - yandex-practicum-kafka
+    depends_on:
+      - kafka-controller-dr-0
+
+  kafka-dr-1:
+    image: confluentinc/cp-kafka:7.4.4
+    ports:
+      - 3190:3190
+      - 3191:3191
+    volumes:
+      - ./cert/kafka-0-creds:/etc/kafka/secrets
+    environment:
+      <<: *kafka_broker_dr-env
+      KAFKA_NODE_ID: 3100
+      KAFKA_LISTENERS: BROKER://:3190,INTERNAL://:3192
+      KAFKA_ADVERTISED_LISTENERS: BROKER://kafka-dr-1:3190,INTERNAL://kafka-dr-1:3192
+      KAFKA_HEAP_OPTS: "-Xmx1g -Xms512m"
+      KAFKA_JMX_OPTS: "-Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dcom.sun.management.jmxremote.port=1091"
+      KAFKA_JMX_PORT: 3191
+    networks:
+      - yandex-practicum-kafka
+    depends_on:
+      - kafka-dr-0
+
+  mirror-maker:
+    image: confluentinc/cp-kafka:7.4.4
+    volumes:
+      - ./infra/mirrormaker/consumer.cfg:/opt/kafka/config/consumer.properties
+      - ./infra/mirrormaker/producer.cfg:/opt/kafka/config/producer.properties
+      - ./cert/kafka-0-creds:/etc/kafka/secrets
+      - ./cert/controller-creds:/etc/kafka/secrets-controller
+      - ./infra/mirrormaker/start.sh:/start.sh
+    environment:
+      KAFKA_HEAP_OPTS: "-Xmx2g -Xms1g"
+      KAFKA_OPTS: "-Djavax.net.debug=ssl -Djava.security.debug=certpath"  # SSL debug
+    command: ["/start.sh"]
+    networks:
+      - yandex-practicum-kafka
+    depends_on:
+      - kafka-0
+      - kafka-1
+      - kafka-dr-0
+      - kafka-dr-1
+
+  # UI для DR кластера
+  kafka-ui-dr:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui-dr
+    ports:
+      - "8091:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: dr-cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-dr-0:3090,kafka-dr-1:3190
+      KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL: SASL_SSL
+      KAFKA_CLUSTERS_0_PROPERTIES_SASL_MECHANISM: PLAIN
+      KAFKA_CLUSTERS_0_PROPERTIES_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin";
+      KAFKA_CLUSTERS_0_PROPERTIES_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.truststore.jks
+      KAFKA_CLUSTERS_0_PROPERTIES_SSL_TRUSTSTORE_PASSWORD: password
+      KAFKA_CLUSTERS_0_PROPERTIES_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.keystore.pkcs12
+      KAFKA_CLUSTERS_0_PROPERTIES_SSL_KEYSTORE_PASSWORD: password
+      KAFKA_CLUSTERS_0_PROPERTIES_SSL_KEY_PASSWORD: password
+      KAFKA_CLUSTERS_0_PROPERTIES_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: ""
+    volumes:
+      - ./cert/kafka-0-creds:/etc/kafka/secrets
+    networks:
+      - yandex-practicum-kafka
+    depends_on:
+      - kafka-dr-1
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8090:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-0:1090,kafka-1:2090
+      KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL: SASL_SSL
+      KAFKA_CLUSTERS_0_PROPERTIES_SASL_MECHANISM: PLAIN
+      KAFKA_CLUSTERS_0_PROPERTIES_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin";
+      KAFKA_CLUSTERS_0_PROPERTIES_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.truststore.jks
+      KAFKA_CLUSTERS_0_PROPERTIES_SSL_TRUSTSTORE_PASSWORD: password
+      KAFKA_CLUSTERS_0_PROPERTIES_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.keystore.pkcs12
+      KAFKA_CLUSTERS_0_PROPERTIES_SSL_KEYSTORE_PASSWORD: password
+      KAFKA_CLUSTERS_0_PROPERTIES_SSL_KEY_PASSWORD: password
+      KAFKA_CLUSTERS_0_PROPERTIES_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: ""
+    volumes:
+      - ./cert/kafka-0-creds:/etc/kafka/secrets
+    networks:
+      - yandex-practicum-kafka
+    depends_on:
+      - kafka-1
+
+  kafka-init:
+    image: confluentinc/cp-kafka:7.4.4
+    container_name: kafka-init
+    volumes:
+      - ./topics/create.sh:/create.sh
+      - ./cert/kafka-0-creds:/etc/kafka/secrets
+      - ./topics/client.properties:/etc/kafka/secrets/client.properties
+    command: [ "/create.sh" ]
+    environment:
+      <<: *kafka_broker-env
+    networks:
+      - yandex-practicum-kafka
+    depends_on:
+      - kafka-0
+      - kafka-1
+      - kafka-controller-0
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.4.4
+    hostname: schema-registry
+    container_name: schema-registry
+    ports:
+      - '8081:8081'
+      - '8082:8082'
+    environment:
+      # Basic Configuration
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081,https://0.0.0.0:8082
+      SCHEMA_REGISTRY_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.keystore.pkcs12
+      SCHEMA_REGISTRY_SSL_KEYSTORE_PASSWORD: password
+      SCHEMA_REGISTRY_SSL_KEY_PASSWORD: password
+      SCHEMA_REGISTRY_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.truststore.jks
+      SCHEMA_REGISTRY_SSL_TRUSTSTORE_PASSWORD: password
+
+      # Kafka Configuration
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka-0:1092,kafka-1:2092  # INTERNAL порты
+      SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: SASL_SSL
+      SCHEMA_REGISTRY_KAFKASTORE_SASL_MECHANISM: PLAIN
+      SCHEMA_REGISTRY_KAFKASTORE_SASL_JAAS_CONFIG: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin";'
+
+      # SSL Configuration
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.truststore.jks
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_PASSWORD: password
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.keystore.pkcs12
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_KEYSTORE_PASSWORD: password
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_KEY_PASSWORD: password
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: ""
+
+      # Additional Settings
+      SCHEMA_REGISTRY_DEBUG: "true"
+    volumes:
+      - ./cert/kafka-0-creds:/etc/kafka/secrets
+    networks:
+      - yandex-practicum-kafka
+    depends_on:
+      - kafka-0
+      - kafka-1
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8081" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  schema-registry-dr:
+    image: confluentinc/cp-schema-registry:7.4.4
+    hostname: schema-registry-dr
+    container_name: schema-registry-dr
+    ports:
+      - '6081:6081'
+      - '6082:6082'
+    environment:
+      # Basic Configuration
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:6081,https://0.0.0.0:6082
+      SCHEMA_REGISTRY_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.keystore.pkcs12
+      SCHEMA_REGISTRY_SSL_KEYSTORE_PASSWORD: password
+      SCHEMA_REGISTRY_SSL_KEY_PASSWORD: password
+      SCHEMA_REGISTRY_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.truststore.jks
+      SCHEMA_REGISTRY_SSL_TRUSTSTORE_PASSWORD: password
+
+      # Kafka Configuration
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka-dr-0:3090,kafka-dr-1:3190  # INTERNAL порты
+      SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: SASL_SSL
+      SCHEMA_REGISTRY_KAFKASTORE_SASL_MECHANISM: PLAIN
+      SCHEMA_REGISTRY_KAFKASTORE_SASL_JAAS_CONFIG: 'org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin";'
+
+      # SSL Configuration
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.truststore.jks
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_TRUSTSTORE_PASSWORD: password
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.keystore.pkcs12
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_KEYSTORE_PASSWORD: password
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_KEY_PASSWORD: password
+      SCHEMA_REGISTRY_KAFKASTORE_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: ""
+
+      # Additional Settings
+      SCHEMA_REGISTRY_DEBUG: "true"
+    volumes:
+      - ./cert/kafka-0-creds:/etc/kafka/secrets
+    networks:
+      - yandex-practicum-kafka
+    depends_on:
+      - kafka-0
+      - kafka-1
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8081" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  postgresql:
+    image: postgres:15-alpine
+    container_name: postgresql
+    environment:
+      POSTGRES_DB: kafka_data
+      POSTGRES_USER: kafka_user
+      POSTGRES_PASSWORD: kafka_password
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5434:5432"
+    volumes:
+      - ./infra/postgres_data:/var/lib/postgresqlkafka/data
+    networks:
+      - yandex-practicum-kafka
+
+  ksqldb-server:
+    image: confluentinc/ksqldb-server:0.29.0
+    container_name: ksqldb-server
+    ports:
+      - "8088:8088"
+    environment:
+      KSQL_LISTENERS: http://0.0.0.0:8088
+      KSQL_BOOTSTRAP_SERVERS: kafka-0:1090,kafka-1:2090
+
+      # Настройки безопасности Kafka
+      KSQL_SECURITY_PROTOCOL: SASL_SSL
+      KSQL_SASL_MECHANISM: PLAIN
+      KSQL_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin";
+
+      # SSL настройки
+      KSQL_SSL_TRUSTSTORE_LOCATION: /etc/kafka/secrets/kafka.truststore.jks
+      KSQL_SSL_TRUSTSTORE_PASSWORD: password
+      KSQL_SSL_KEYSTORE_LOCATION: /etc/kafka/secrets/kafka.keystore.pkcs12
+      KSQL_SSL_KEYSTORE_PASSWORD: password
+      KSQL_SSL_KEY_PASSWORD: password
+      KSQL_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM: ""
+
+      # Дополнительные настройки
+      KSQL_KSQL_LOGGING_PROCESSING_STREAM_AUTO_CREATE: "true"
+      KSQL_KSQL_LOGGING_PROCESSING_TOPIC_AUTO_CREATE: "true"
+      KSQL_KSQL_STREAMS_AUTO_OFFSET_RESET: "earliest"
+
+      # Инициализационные скрипты
+      KSQL_KSQL_INIT_SCRIPT: /etc/ksql/init.sql
+
+    volumes:
+      - ./cert/kafka-0-creds:/etc/kafka/secrets
+      - ./infra/ksql/init.sql:/etc/ksql/init.sql  # Монтируем скрипт инициализации
+    networks:
+      - yandex-practicum-kafka
+    depends_on:
+      - kafka-0
+      - kafka-1
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8088/info" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  ksqldb-cli:
+    image: confluentinc/ksqldb-cli:0.29.0
+    container_name: ksqldb-cli
+    entrypoint: /bin/sh
+    tty: true
+    stdin_open: true
+    environment:
+      KSQL_SECURITY_PROTOCOL: SASL_SSL
+      KSQL_SASL_MECHANISM: PLAIN
+      KSQL_SASL_JAAS_CONFIG: org.apache.kafka.common.security.plain.PlainLoginModule required username="admin" password="admin";
+    volumes:
+      - ./cert/kafka-0-creds:/etc/kafka/secrets
+    networks:
+      - yandex-practicum-kafka
+    depends_on:
+      - ksqldb-server
+
+  # Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./.infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./.infra/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - ./.infra/prometheus/prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
+    networks:
+      - yandex-practicum-kafka
+    depends_on:
+      - kafka-0
+      - kafka-1
+
+  # Alertmanager
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./.infra/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - ./.infra/alertmanager/alertmanager_data:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+      - '--web.external-url=http://localhost:9093'
+    networks:
+      - yandex-practicum-kafka
+
+  # Grafana
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./.infra/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./.infra/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - ./.infra/grafana/grafana_data:/var/lib/grafana
+    networks:
+      - yandex-practicum-kafka
+    depends_on:
+      - prometheus
+
+  # JMX Exporter для Kafka брокеров
+  kafka-exporter:
+    image: danielqsj/kafka-exporter:latest
+    container_name: kafka-exporter
+    ports:
+      - "9308:9308"
+    volumes:
+      - ./cert/kafka-0-creds:/etc/kafka/secrets
+    command:
+      # Primary cluster brokers
+      - "--kafka.server=kafka-0:1090"
+      - "--kafka.server=kafka-1:2090"
+      # DR cluster brokers
+      - "--kafka.server=kafka-dr-0:3090"
+      - "--kafka.server=kafka-dr-1:3190"
+      # SASL authentication
+      - "--sasl.enabled"
+      - "--sasl.username=admin"
+      - "--sasl.password=admin"
+      - "--sasl.mechanism=plain"
+      # TLS configuration
+      - "--tls.enabled"
+      - "--tls.ca-file=/etc/kafka/secrets/ca.pem"
+      - "--tls.cert-file=/etc/kafka/secrets/kafka-cert.pem"
+      - "--tls.key-file=/etc/kafka/secrets/kafka-cert.pem"
+      - "--tls.insecure-skip-tls-verify"
+    networks:
+      - yandex-practicum-kafka
+    depends_on:
+      - kafka-0
+      - kafka-1
+      - kafka-dr-0
+      - kafka-dr-1
+
+  # Node Exporter для мониторинга хоста
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    volumes:
+      - ./infra/nodeExporter/proc:/host/proc:ro
+      - ./infra/nodeExporter/sys:/host/sys:ro
+      - ./infra/nodeExporter/:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    networks:
+      - yandex-practicum-kafka
+
+  shopproducer:
+    <<: *java-service
+    container_name: shopProducer
+    build:
+      context: ./shopProducer
+    ports:
+      - "3333:3333"
+    volumes:
+      - ./infra/schema:/etc/schema
+      - ./cert/kafka-0-creds:/etc/kafka/secrets
+      - ./data:/etc/data
+      - ./ready:/etc/ready
+    networks:
+      - yandex-practicum-kafka
+    depends_on:
+      schema-registry:
+        condition: service_healthy
+
+  shop-stoplist-producer:
+    <<: *java-service
+    container_name: shopStopListProducer
+    build:
+      context: ./shopStopListProducer
+    ports:
+      - "1111:1111"
+    volumes:
+      - ./cert/kafka-0-creds:/etc/kafka/secrets
+      - ./infra/stopList:/etc/data
+    networks:
+      - yandex-practicum-kafka
+    depends_on:
+      schema-registry:
+        condition: service_healthy
+
+  shop-product-filter-stream:
+    <<: *java-service
+    container_name: shopProductFilterStream
+    build:
+      context: ./shopProductFilterStream
+    ports:
+      - "1112:1112"
+    volumes:
+      - ./cert/kafka-0-creds:/etc/kafka/secrets
+    networks:
+      - yandex-practicum-kafka
+    depends_on:
+      schema-registry:
+        condition: service_healthy
+
+  shop-consumer:
+    <<: *java-service
+    container_name: shopConsumer
+    build:
+      context: ./shopConsumer
+    ports:
+      - "1122:1122"
+    volumes:
+      - ./cert/kafka-0-creds:/etc/kafka/secrets
+    networks:
+      - yandex-practicum-kafka
+    depends_on:
+      schema-registry:
+        condition: service_healthy
+
+  client:
+    <<: *java-service
+    container_name: client
+    build:
+      context: ./client
+    ports:
+      - "1113:1113"
+    volumes:
+      - ./cert/kafka-0-creds:/etc/kafka/secrets
+    networks:
+      - yandex-practicum-kafka
+    depends_on:
+      schema-registry:
+        condition: service_healthy
+
+volumes:
+  hadoop_namenode:
+    driver: local
+  hadoop_datanode1:
+    driver: local
+  hadoop_datanode2:
+    driver: local
+  spark_data:
+    driver: local
+  postgres_data:
+    driver: local
+  grafana_data:
+    driver: local
+  control-center-data:
+    driver: local
+  prometheus_data:
+    driver: local
+  alertmanager_data:
+    driver: local
+
+networks:
+  yandex-practicum-kafka:
+    name: yandex-practicum-kafka

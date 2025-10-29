@@ -1,0 +1,42 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'kafka-cluster'
+    environment: 'production'
+
+rule_files:
+  - "alerts.yml"
+
+scrape_configs:
+  # Prometheus сам мониторинг
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+    scrape_interval: 10s
+
+  # Kafka Exporter - метрики Kafka
+  - job_name: 'kafka-exporter'
+    static_configs:
+      - targets: ['kafka-exporter:9308']
+    scrape_interval: 10s
+    metrics_path: /metrics
+
+  # Kafka брокеры
+  - job_name: 'kafka-brokers'
+    static_configs:
+      - targets:
+          - 'kafka-0:1090'
+          - 'kafka-1:2090'
+          - 'kafka-dr-0:3090'
+          - 'kafka-dr-1:3190'
+    scrape_interval: 15s
+    metrics_path: /metrics
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - 'alertmanager:9093'
+      scheme: http
+      timeout: 10s
