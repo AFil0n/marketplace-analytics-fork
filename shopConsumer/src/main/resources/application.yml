@@ -1,0 +1,43 @@
+server:
+  port: 1122
+
+spring:
+  application:
+    name: shop-consumer
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://postgresql:5432/kafka_data
+    username: kafka_user
+    password: kafka_password
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        show_sql: false
+        format_sql: true
+    packages-to-scan: ru.practicum.common.model
+    sql:
+      init:
+        mode: always
+
+jpa:
+  hibernate:
+    ddl-auto: validate
+  properties:
+    hibernate:
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+      format_sql: true
+      connection.provider_disables_autocommit: false
+  show-sql: true
+
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
+sql:
+  init:
+    mode: always
+    schema-locations: classpath:schema.sql
+    data-locations: classpath:data.sql
+    continue-on-error: true
